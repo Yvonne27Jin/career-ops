@@ -94,6 +94,19 @@ On a ⛔ determination, add exactly one flag line at the top of Block B in the r
 
 The flag is additive only; ✅ / ➖ / ⚠️ emit no flag line.
 
+**IND recognised-sponsor register (Netherlands roles only).** The four tiers above read the *JD*; they do not tell you whether the *employer* is legally able to sponsor. When `needs_sponsorship` is true and the role is in the Netherlands, also check whether the employer is on the IND register of recognised sponsors — this is a separate, employer-level fact:
+
+```bash
+node sponsor-check.mjs "{employer legal/marketing name}" --summary
+```
+
+The script is zero-token and offline, reading bundled register snapshots in `templates/sponsor-register/` (KM / kennismigrant work permit + research visa). It grades ✅ on the register / 🟡 likely / 🟠 possible / ❌ not found; a group's presence under any one legal entity means the group is recognised. Fold the result into the report as evidence, not as a fifth tier, and respect these boundaries:
+
+- **The register is a snapshot, not the live IND page, and never a legal guarantee** (it updates monthly — re-check https://ind.nl/en/public-register-recognised-sponsors for anything decision-critical). Being on the register does **not** mean the company will sponsor *this* role or that it clears the salary threshold.
+- **The JD wins over the register.** A ⛔ JD ("no visa sponsorship") stays ⛔ even when the employer is a recognised sponsor — believe the posting. The register only sharpens the ⚠️ Unstated case: an ❌ not-found employer on an otherwise-silent NL posting is a real sponsorship risk worth surfacing in Block B; a ✅ recognised sponsor makes the same silence far less worrying.
+- The register check is **advisory context in the report**, not a scoring input on its own — only the JD-derived ⛔ tier moves the location score, exactly as above. (The user's own `modes/_profile.md` may set a harder personal line; honor it there.)
+- The `km-sponsor-check` skill, when enabled, is an equivalent interactive alias over the same two CSVs — either path is fine.
+
 ## Block B — Match with CV
 
 One table, one row per significant JD requirement, mapped to exact evidence in the primary files (`cv.md` first, then `article-digest.md`, `config/profile.yml`, `modes/_profile.md`). Block B **is** the requirement→evidence mapping for the whole report: never emit a second matrix that re-enumerates the same requirements, because nothing keeps two lists in sync and the first disagreement between them contradicts the report in a way no test can catch.
