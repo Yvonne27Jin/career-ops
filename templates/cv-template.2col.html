@@ -41,8 +41,8 @@
     --accent-color: hsl(187 74% 32%);
     --secondary-color: #1a1a2e;
     --font-family: "Liberation Sans", 'Helvetica Neue', Arial, 'DejaVu Sans', sans-serif;
-    --font-size: 11px;
-    --aside-font-size: 10.5px;
+    --font-size: 13.5px;
+    --aside-font-size: 12.25px;
     --page-margin: 0.35in;
     --sidebar-rule: #e2e2e2;
   }
@@ -118,7 +118,7 @@
   .section { margin-bottom: 3px; }
 
   .section-title {
-    font-size: 13px;
+    font-size: 15.5px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -187,7 +187,7 @@
 
   /* === SIDEBAR TYPE SCALE === */
   .cv-aside .section-title,
-  .section--summary .section-title { font-size: 12px; }
+  .section--summary .section-title { font-size: 14.5px; }
   .cv-aside .section { margin-bottom: 8px; }
 
   /* Skills stack vertically in the narrow column (override the wide .skills-grid flex row). */
@@ -205,7 +205,10 @@
   .cv-aside .award-item > * { display: block; text-align: left; width: auto; }
   .cv-aside .cert-title,
   .cv-aside .award-title { font-size: var(--aside-font-size); font-weight: 600; color: #222; line-height: 1.25; }
-  .cv-aside .cert-title a { color: inherit; text-decoration: none; }
+  /* Sidebar cert titles may wrap — overrides the global `a { white-space: nowrap }`
+     (meant for the one-line contact row) so a long credential name like
+     "Analyzing and Visualizing Data in Looker" can't overflow the narrow column. */
+  .cv-aside .cert-title a { color: inherit; text-decoration: none; white-space: normal; }
   .cv-aside .cert-org,
   .cv-aside .award-org { font-size: 9.2px; color: #555; white-space: normal; }
   .cv-aside .cert-year,
@@ -222,12 +225,17 @@
     gap: 12px;
     margin-bottom: 1px;
   }
-  .job-title-line { line-height: 1.2; }
-  .job-role-inline { font-size: 11.5px; font-weight: 700; color: #1a1a2e; }
-  .job-company-inline { font-size: 11px; font-weight: 600; color: #333; }
-  .job-period { font-size: 10px; color: #777; white-space: nowrap; }
+  /* Two-line job header: role on line 1, company (+ location) on line 2.
+     The shared experience partial wraps the " - " separator in .job-sep;
+     collapsing it with height:0 + overflow hidden (an ATS-safe way to drop a
+     punctuation separator) lets the role and company spans stack as blocks. */
+  .job-title-line { line-height: 1.25; }
+  .job-role-inline { display: block; font-size: 14px; font-weight: 700; color: #1a1a2e; }
+  .job-company-inline { display: block; font-size: 13.5px; font-weight: 600; color: #444; }
+  .job-sep { display: block; height: 0; overflow: hidden; }
+  .job-period { font-size: 11px; color: #777; white-space: nowrap; }
   .job ul { padding-left: 16px; margin-top: 1px; }
-  .job li { font-size: 10.5px; line-height: 1.24; color: #333; margin-bottom: 1px; }
+  .job li { font-size: 13px; line-height: 1.26; color: #333; margin-bottom: 1.5px; }
   .job li strong { font-weight: 700; color: #1a1a2e; }
 
   /* === EDUCATION (wide column) === */
@@ -242,14 +250,14 @@
     align-items: baseline;
     gap: 12px;
   }
-  .edu-title { font-weight: 600; font-size: 11px; color: #333; }
+  .edu-title { font-weight: 600; font-size: 13.5px; color: #333; }
   /* Institution is the strongest signal in a Dutch-HR scan: render it bold and
      dark (not italic grey) so the school name is what the eye lands on first. */
   .edu-org { color: #1a1a2e; font-weight: 700; font-style: normal; }
-  .edu-year { font-size: 10px; color: #777; white-space: nowrap; }
+  .edu-year { font-size: 11px; color: #777; white-space: nowrap; }
   /* edu-desc carries the GPA on its own line here — accent-coloured and semibold
      so the grade stands out instead of being buried inside the degree title. */
-  .edu-desc { font-size: 10.25px; color: var(--accent-color); font-weight: 600; margin-top: 1px; line-height: 1.3; }
+  .edu-desc { font-size: 12.5px; color: var(--accent-color); font-weight: 600; margin-top: 1px; line-height: 1.3; }
 
   /* === PROJECTS (wide column) === */
   .project { margin-bottom: 7px; }
