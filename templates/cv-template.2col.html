@@ -41,8 +41,8 @@
     --accent-color: hsl(187 74% 32%);
     --secondary-color: #1a1a2e;
     --font-family: "Liberation Sans", 'Helvetica Neue', Arial, 'DejaVu Sans', sans-serif;
-    --font-size: 10.25px;
-    --aside-font-size: 9.8px;
+    --font-size: 11px;
+    --aside-font-size: 10.5px;
     --page-margin: 0.35in;
     --sidebar-rule: #e2e2e2;
   }
@@ -118,43 +118,48 @@
   .section { margin-bottom: 3px; }
 
   .section-title {
-    font-size: 11.5px;
+    font-size: 13px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--accent-color);
     border-bottom: 1.5px solid var(--sidebar-rule);
-    padding-bottom: 1px;
+    padding-bottom: 2px;
     margin-bottom: 3px;
     line-height: 1.1;
   }
 
-  /* === FULL-WIDTH PROFILE === */
-  .section--summary { margin-bottom: 6px; }
+  /* === PROFILE (narrow left column) === */
+  .section--summary { margin-bottom: 7px; }
   .summary-text {
-    font-size: var(--font-size);
-    line-height: 1.25;
+    font-size: var(--aside-font-size);
+    line-height: 1.32;
     color: #2f2f2f;
   }
   .summary-text strong { font-weight: 700; color: #1a1a1a; }
 
   /* === TWO-COLUMN GRID ===
-     Sidebar left, main right. The DOM order is main-then-aside (main leads the
-     reading order for ATS); grid-column places each explicitly, so the visual
-     columns are independent of source order. */
+     Narrow left column (Profile on top, then the sidebar: skills, certs,
+     interests), wide right column (main). The summary stays FIRST in the DOM
+     source order so validateCvSectionOrder() still sees the canonical order
+     (summary -> experience -> ... -> skills); grid placement is what moves it
+     into the left column visually, independent of source order. The main column
+     spans both grid rows so it fills the full height on the right. */
   .cv-grid {
     display: grid;
     grid-template-columns: 33% 1fr;
     column-gap: 22px;
     align-items: start;
   }
-  .cv-aside { grid-column: 1; grid-row: 1; display: flex; flex-direction: column; }
-  .cv-main  { grid-column: 2; grid-row: 1; display: flex; flex-direction: column; }
+  .cv-grid > .section--summary { grid-column: 1; grid-row: 1; }
+  .cv-aside { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; }
+  .cv-main  { grid-column: 2; grid-row: 1 / 3; display: flex; flex-direction: column; }
 
-  /* Visual order inside the WIDE column: Experience, then Education directly
-     below it, then Projects. Source order stays canonical for the order gate. */
-  .cv-main .section--experience { order: 1; }
-  .cv-main .section--education  { order: 2; }
+  /* Visual order inside the WIDE column: Education FIRST (house rule — the
+     school is Yvonne's strongest signal), then Experience, then Projects.
+     Source order stays canonical for the order gate. */
+  .cv-main .section--education  { order: 1; }
+  .cv-main .section--experience { order: 2; }
   .cv-main .section--projects   { order: 3; }
 
   /* Visual order inside the SIDEBAR: photo, then Skills (a key scan target),
@@ -181,7 +186,8 @@
   .cv-photo--square { border-radius: 0; aspect-ratio: 1; }
 
   /* === SIDEBAR TYPE SCALE === */
-  .cv-aside .section-title { font-size: 10.5px; }
+  .cv-aside .section-title,
+  .section--summary .section-title { font-size: 12px; }
   .cv-aside .section { margin-bottom: 8px; }
 
   /* Skills stack vertically in the narrow column (override the wide .skills-grid flex row). */
@@ -208,7 +214,7 @@
   .cv-aside .interests-line { font-size: var(--aside-font-size); color: #444; line-height: 1.35; }
 
   /* === WORK EXPERIENCE (wide column) === */
-  .job { margin-bottom: 4px; }
+  .job { margin-bottom: 3px; }
   .job-header {
     display: flex;
     justify-content: space-between;
@@ -217,11 +223,11 @@
     margin-bottom: 1px;
   }
   .job-title-line { line-height: 1.2; }
-  .job-role-inline { font-size: 11px; font-weight: 700; color: #1a1a2e; }
-  .job-company-inline { font-size: 10.5px; font-weight: 600; color: #333; }
-  .job-period { font-size: 9.8px; color: #777; white-space: nowrap; }
+  .job-role-inline { font-size: 11.5px; font-weight: 700; color: #1a1a2e; }
+  .job-company-inline { font-size: 11px; font-weight: 600; color: #333; }
+  .job-period { font-size: 10px; color: #777; white-space: nowrap; }
   .job ul { padding-left: 16px; margin-top: 1px; }
-  .job li { font-size: 9.75px; line-height: 1.22; color: #333; margin-bottom: 1px; }
+  .job li { font-size: 10.5px; line-height: 1.24; color: #333; margin-bottom: 1px; }
   .job li strong { font-weight: 700; color: #1a1a2e; }
 
   /* === EDUCATION (wide column) === */
@@ -236,14 +242,14 @@
     align-items: baseline;
     gap: 12px;
   }
-  .edu-title { font-weight: 600; font-size: 10.5px; color: #333; }
+  .edu-title { font-weight: 600; font-size: 11px; color: #333; }
   /* Institution is the strongest signal in a Dutch-HR scan: render it bold and
      dark (not italic grey) so the school name is what the eye lands on first. */
   .edu-org { color: #1a1a2e; font-weight: 700; font-style: normal; }
-  .edu-year { font-size: 9.8px; color: #777; white-space: nowrap; }
+  .edu-year { font-size: 10px; color: #777; white-space: nowrap; }
   /* edu-desc carries the GPA on its own line here — accent-coloured and semibold
      so the grade stands out instead of being buried inside the degree title. */
-  .edu-desc { font-size: 9.8px; color: var(--accent-color); font-weight: 600; margin-top: 1px; line-height: 1.3; }
+  .edu-desc { font-size: 10.25px; color: var(--accent-color); font-weight: 600; margin-top: 1px; line-height: 1.3; }
 
   /* === PROJECTS (wide column) === */
   .project { margin-bottom: 7px; }
@@ -309,14 +315,15 @@
     </div>
   </div>
 
-  <!-- PROFESSIONAL SUMMARY -->
-  <div class="section section--summary">
-    <div class="section-title">{{SECTION_SUMMARY}}</div>
-    <div class="summary-text">{{SUMMARY_TEXT}}</div>
-  </div>
-
   <!-- LAYOUT -->
   <div class="cv-grid">
+
+    <!-- PROFILE (first in source order for the section-order gate; grid places
+         it at the top of the narrow left column) -->
+    <div class="section section--summary">
+      <div class="section-title">{{SECTION_SUMMARY}}</div>
+      <div class="summary-text">{{SUMMARY_TEXT}}</div>
+    </div>
 
     <div class="cv-main">
 
