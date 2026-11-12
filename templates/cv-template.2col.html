@@ -41,9 +41,9 @@
     --accent-color: hsl(187 74% 32%);
     --secondary-color: #1a1a2e;
     --font-family: "Liberation Sans", 'Helvetica Neue', Arial, 'DejaVu Sans', sans-serif;
-    --font-size: 10.5px;
-    --aside-font-size: 9.9px;
-    --page-margin: 0.5in;
+    --font-size: 10.25px;
+    --aside-font-size: 9.8px;
+    --page-margin: 0.35in;
     --sidebar-rule: #e2e2e2;
   }
   @page { margin: var(--page-margin); }
@@ -115,7 +115,7 @@
   .ext-link-icon { font-size: 8.5px; }
 
   /* === SECTION PRIMITIVES === */
-  .section { margin-bottom: 7px; }
+  .section { margin-bottom: 3px; }
 
   .section-title {
     font-size: 11.5px;
@@ -124,16 +124,16 @@
     letter-spacing: 0.06em;
     color: var(--accent-color);
     border-bottom: 1.5px solid var(--sidebar-rule);
-    padding-bottom: 2px;
-    margin-bottom: 4px;
+    padding-bottom: 1px;
+    margin-bottom: 3px;
     line-height: 1.1;
   }
 
   /* === FULL-WIDTH PROFILE === */
-  .section--summary { margin-bottom: 9px; }
+  .section--summary { margin-bottom: 6px; }
   .summary-text {
     font-size: var(--font-size);
-    line-height: 1.3;
+    line-height: 1.25;
     color: #2f2f2f;
   }
   .summary-text strong { font-weight: 700; color: #1a1a1a; }
@@ -208,34 +208,42 @@
   .cv-aside .interests-line { font-size: var(--aside-font-size); color: #444; line-height: 1.35; }
 
   /* === WORK EXPERIENCE (wide column) === */
-  .job { margin-bottom: 7px; }
+  .job { margin-bottom: 4px; }
   .job-header {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     gap: 12px;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
   }
   .job-title-line { line-height: 1.2; }
   .job-role-inline { font-size: 11px; font-weight: 700; color: #1a1a2e; }
   .job-company-inline { font-size: 10.5px; font-weight: 600; color: #333; }
   .job-period { font-size: 9.8px; color: #777; white-space: nowrap; }
-  .job ul { padding-left: 16px; margin-top: 2px; }
-  .job li { font-size: 10px; line-height: 1.28; color: #333; margin-bottom: 1.5px; }
+  .job ul { padding-left: 16px; margin-top: 1px; }
+  .job li { font-size: 9.75px; line-height: 1.22; color: #333; margin-bottom: 1px; }
   .job li strong { font-weight: 700; color: #1a1a2e; }
 
   /* === EDUCATION (wide column) === */
-  .edu-item { margin-bottom: 5px; }
+  .edu-item { margin-bottom: 3px; }
+  /* No dead whitespace below the last block in each column — trailing margin
+     must never be what tips a nearly-full page onto a second sheet. */
+  .cv-main .section:last-child,
+  .cv-main .edu-item:last-child { margin-bottom: 0; }
   .edu-header {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     gap: 12px;
   }
-  .edu-title { font-weight: 700; font-size: 10.75px; color: #1a1a2e; }
-  .edu-org { color: #555; font-weight: 500; font-style: italic; }
+  .edu-title { font-weight: 600; font-size: 10.5px; color: #333; }
+  /* Institution is the strongest signal in a Dutch-HR scan: render it bold and
+     dark (not italic grey) so the school name is what the eye lands on first. */
+  .edu-org { color: #1a1a2e; font-weight: 700; font-style: normal; }
   .edu-year { font-size: 9.8px; color: #777; white-space: nowrap; }
-  .edu-desc { font-size: 9.6px; color: #666; margin-top: 2px; line-height: 1.3; }
+  /* edu-desc carries the GPA on its own line here — accent-coloured and semibold
+     so the grade stands out instead of being buried inside the degree title. */
+  .edu-desc { font-size: 9.8px; color: var(--accent-color); font-weight: 600; margin-top: 1px; line-height: 1.3; }
 
   /* === PROJECTS (wide column) === */
   .project { margin-bottom: 7px; }

@@ -81,6 +81,18 @@ function escapeHtml(text) {
     .replace(/'/g, '&#39;');
 }
 
+// Convert **bold** spans (Markdown) in ALREADY-ESCAPED text into <strong> tags.
+// It runs strictly AFTER escapeHtml(), so the span's inner text is already safe
+// (no raw < > & " '), and this only introduces our own <strong>/</strong> pair —
+// never markup from the payload. Used for the summary and experience bullets so
+// the agent can bold the key technical terms a recruiter scans for (the template
+// styles .summary-text strong and .job li strong). A replacer function is used so
+// any literal $ in the captured text is inserted verbatim, not as a $-pattern.
+function boldify(escaped) {
+  if (typeof escaped !== 'string') return escaped;
+  return escaped.replace(/\*\*([^*]+)\*\*/g, (_, inner) => `<strong>${inner}</strong>`);
+}
+
 // Sanitize a URL for an href attribute: only allow the schemes the template's
 // contact row uses, coerce bare emails/domains, drop javascript:/data: and other
 // script-bearing schemes, then HTML-escape for the attribute context.
@@ -351,7 +363,7 @@ function buildExperience(entries, partial) {
   if (!partial) {
     return entries.filter(e => hasRequiredFields(e, 'experience', 'html')).map(e => {
       const bullets = Array.isArray(e.bullets)
-        ? e.bullets.filter(Boolean).map(b => `        <li>${escapeHtml(b)}</li>`).join('\n')
+        ? e.bullets.filter(Boolean).map(b => `        <li>${boldify(escapeHtml(b))}</li>`).join('\n')
         : '';
       const location = e.location
         ? `\n    <div class="job-location">${escapeHtml(e.location)}</div>`
@@ -372,7 +384,7 @@ ${bullets}
   const { entryTemplate, blocks } = partial;
   return entries.filter(e => hasRequiredFields(e, 'experience', 'html')).map(e => {
     const bullets = Array.isArray(e.bullets)
-      ? e.bullets.filter(Boolean).map(b => `<li>${escapeHtml(b)}</li>`).join('\n    ')
+      ? e.bullets.filter(Boolean).map(b => `<li>${boldify(escapeHtml(b))}</li>`).join('\n    ')
       : '';
     const blockValues = new Map([
       ['LOCATION_BLOCK', { value: escapeHtml(e.location || ''), present: Boolean(e.location) }],
@@ -652,7 +664,7 @@ function renderReport(payload, partials) {
     PAGE_WIDTH: pageWidth,
     NAME: escapeHtml(candidate.name || ''),
     SECTION_SUMMARY: escapeHtml(sectionTitles.summary),
-    SUMMARY_TEXT: escapeHtml(payload.summary || ''),
+    SUMMARY_TEXT: boldify(escapeHtml(payload.summary || '')),
     SECTION_COMPETENCIES: escapeHtml(sectionTitles.competencies),
     COMPETENCIES: buildCompetencies(payload.competencies, partials.get('competencies')),
     SECTION_EXPERIENCE: escapeHtml(sectionTitles.experience),
