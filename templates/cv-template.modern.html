@@ -192,6 +192,22 @@ version: 1.0.0
     white-space: nowrap;
   }
 
+  .job-title-line {
+    font-family: var(--font-family);
+  }
+
+  .job-role-inline {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent-color);
+  }
+
+  .job-company-inline {
+    font-size: 11px;
+    font-style: italic;
+    color: #0d0f13;
+  }
+
   .job-role {
     font-size: 11px;
     font-weight: 600;
@@ -260,7 +276,7 @@ version: 1.0.0
 
   .edu-title { font-weight: 700; color: #0d0f13; }
 
-  .edu-org { font-weight: 600; color: var(--accent-color); }
+  .edu-org { font-weight: 600; color: var(--accent-color); font-style: italic; }
 
   .edu-year {
     font-size: 9px;
@@ -401,6 +417,18 @@ version: 1.0.0
     <div class="summary-text">{{SUMMARY_TEXT}}</div>
   </div>
 
+  <!-- EDUCATION -->
+  <div class="section">
+    <div class="section-title">{{SECTION_EDUCATION}}</div>
+    {{EDUCATION}}
+  </div>
+
+  <!-- SKILLS -->
+  <div class="section">
+    <div class="section-title">{{SECTION_SKILLS}}</div>
+    {{SKILLS}}
+  </div>
+
   <!-- CORE COMPETENCIES -->
   <div class="section">
     <div class="section-title">{{SECTION_COMPETENCIES}}</div>
@@ -421,12 +449,6 @@ version: 1.0.0
     {{PROJECTS}}
   </div>
 
-  <!-- EDUCATION -->
-  <div class="section">
-    <div class="section-title">{{SECTION_EDUCATION}}</div>
-    {{EDUCATION}}
-  </div>
-
   <!-- CERTIFICATIONS -->
   <div class="section">
     <div class="section-title">{{SECTION_CERTIFICATIONS}}</div>
@@ -437,12 +459,6 @@ version: 1.0.0
   <div class="section">
     <div class="section-title">{{SECTION_AWARDS}}</div>
     <div class="award-table">{{AWARDS}}</div>
-  </div>
-
-  <!-- SKILLS -->
-  <div class="section">
-    <div class="section-title">{{SECTION_SKILLS}}</div>
-    {{SKILLS}}
   </div>
 
   <!-- END -->

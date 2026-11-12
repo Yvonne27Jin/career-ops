@@ -176,6 +176,23 @@ version: 1.0.0
     white-space: nowrap;
   }
 
+  .job-title-line {
+    font-family: var(--font-family);
+  }
+
+  .job-role-inline {
+    font-size: 11px;
+    font-weight: 700;
+    color: #1b1b1b;
+  }
+
+  .job-company-inline {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.035em;
+    color: var(--accent-color);
+  }
+
   .job-role {
     float: left;
     font-size: 11px;
@@ -355,6 +372,18 @@ version: 1.0.0
     <div class="summary-text">{{SUMMARY_TEXT}}</div>
   </div>
 
+  <!-- EDUCATION -->
+  <div class="section">
+    <div class="section-title">{{SECTION_EDUCATION}}</div>
+    {{EDUCATION}}
+  </div>
+
+  <!-- SKILLS -->
+  <div class="section">
+    <div class="section-title">{{SECTION_SKILLS}}</div>
+    {{SKILLS}}
+  </div>
+
   <!-- CORE COMPETENCIES -->
   <div class="section">
     <div class="section-title">{{SECTION_COMPETENCIES}}</div>
@@ -375,12 +404,6 @@ version: 1.0.0
     {{PROJECTS}}
   </div>
 
-  <!-- EDUCATION -->
-  <div class="section">
-    <div class="section-title">{{SECTION_EDUCATION}}</div>
-    {{EDUCATION}}
-  </div>
-
   <!-- CERTIFICATIONS -->
   <div class="section">
     <div class="section-title">{{SECTION_CERTIFICATIONS}}</div>
@@ -391,12 +414,6 @@ version: 1.0.0
   <div class="section">
     <div class="section-title">{{SECTION_AWARDS}}</div>
     <div class="award-table">{{AWARDS}}</div>
-  </div>
-
-  <!-- SKILLS -->
-  <div class="section">
-    <div class="section-title">{{SECTION_SKILLS}}</div>
-    {{SKILLS}}
   </div>
 
   <!-- END -->

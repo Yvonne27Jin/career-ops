@@ -17,7 +17,7 @@ Run `npm run jd:similarity -- {bundle-root}/jd/current.md {bundle-root}/jd/previ
 4. Run the zero-LLM skill-gap check before drafting anything: **always** write the JD to `jds/{slug}.md` first — required, not conditional, even when a report for this application already exists — then `node jd-skill-gap.mjs jds/{slug}.md --summary`. This classifies the JD's explicit requirements against `cv.md` into three buckets — never surface `result.gap` items as if the candidate has them:
    - **JD archival (required, #2789):** this write doubles as the JD archive for this application. A `**URL:**` header alone is a live pointer, not an archive — it rots once the posting closes. When this run is part of a full `oferta` evaluation, the report's own `## Job Description (archived verbatim)` section is the primary archive and this `jds/{slug}.md` write is a secondary copy; when `pdf` is run standalone (no report), this file IS the archive, so prefer naming/keying it to the report with `archive-posting.mjs --report={num}` when a report number exists. `check-jd-archive.mjs` validates every report has one form or the other. If a posting date is visible anywhere in the source — URL-scraped page text, pasted JD text, or a screenshot being transcribed — include it as the first line of the file: `Posted: {date or relative string as shown}`, or `Posted: not visible in source` when absent. Never substitute the report file's own filesystem mtime/creation time for this — it records when the candidate processed the JD, not when the employer posted it.
    - `existing` — already a named skill in cv.md's Skills section, safe to lead with
-   - `supportedByResume` — not a named skill yet, but cv.md's prose already demonstrates it; legitimate candidates for the Skills section in the user's own words (Step 13's competency grid draws from here first)
+   - `supportedByResume` — not a named skill yet, but cv.md's prose already demonstrates it; legitimate candidates for the Skills section in the user's own words (Step 13 draws from here first)
    - `gap` — cv.md has no trace of it at all. **Tell the user explicitly which skills are gaps before generating the CV.** Never paper over a gap by inventing a claim, and never silently drop it from the conversation — the user decides whether to proceed, address it in the cover letter/interview, or skip the role
 
    If the output prints a `🚨 LOW CONFIDENCE` block, zero skills were classified, so the three empty buckets mean "nothing was classified", not "no gaps found". **Never treat this as a pass, whichever reason is given.** Read the JD yourself to identify the required skills before drafting, and tell the user the automated check produced no result. The reason code says which of the three shapes it is:
@@ -36,7 +36,7 @@ Run `npm run jd:similarity -- {bundle-root}/jd/current.md {bundle-root}/jd/previ
 10. Rewrite Professional Summary by injecting JD keywords + exit narrative bridge ("Built and sold a business. Now applying systems thinking to [JD domain].")
 11. Select top 3-4 most relevant projects for the job. If `cv.md` carries an Awards / Honors section, populate `awards[]` with the entries that support this role — for an early-career candidate a contest medal or dean's list often outranks a thin project. Omit the key when there is nothing to list and the section disappears entirely; never invent an award to fill it
 12. Reorder experience bullets by JD relevance and by the risk map: strongest matching evidence first
-13. Build competency grid from JD requirements (6-8 keyword phrases), prioritizing `existing` and `supportedByResume` skills from Step 4 — never a `gap` skill
+13. **No Core Competencies section (confirmed 2026-09-23, see `modes/_custom.md`).** Do not populate a `competencies[]` array. Instead, fold the same 6-8 JD-matched keyword phrases from Step 4's `existing`/`supportedByResume` buckets — never a `gap` skill — into the `skills[]` array (lead with a category ordered to match the JD's own emphasis, e.g. a domain-specific category moved to the top) and into the Summary/experience bullets per Steps 10, 12 and 14. The keywords still land on the CV; they just live where the candidate's real skills and achievements already are, not in a separate tag grid.
 14. Inject keywords naturally into existing achievements (NEVER invent)
 15. Apply the six-second clarity gate from `modes/heuristics/recruiter-side.md`: top third must make target role, strongest fit, and proof obvious
 16. Read `name` from `config/profile.yml` → normalize to kebab-case lowercase (e.g. "John Doe" → "john-doe") → `{candidate}`
@@ -62,7 +62,7 @@ Run `npm run jd:similarity -- {bundle-root}/jd/current.md {bundle-root}/jd/previ
 
 - Single-column layout (no sidebars, no parallel columns)
 - Standard headers: "Professional Summary", "Work Experience", "Education", "Skills", "Certifications", "Projects"
-- Optional sections (Core Competencies, Work Experience, Projects, Education, Certifications, Awards & Honors, Skills) are dropped entirely — header included — when their array is empty or absent
+- Optional sections (Work Experience, Projects, Education, Certifications, Awards & Honors, Skills) are dropped entirely — header included — when their array is empty or absent. Core Competencies is no longer part of the standard flow at all (confirmed 2026-09-23) — see Step 13
 - No text in images/SVGs
 - No critical info in PDF headers/footers (ATS ignores them)
 - UTF-8, selectable text (not rasterized)
@@ -94,11 +94,12 @@ Run `npm run jd:similarity -- {bundle-root}/jd/current.md {bundle-root}/jd/previ
 
 1. Header (large name, gradient, contact, portfolio link)
 2. Professional Summary (3-4 lines, keyword-dense)
-3. Core Competencies (6-8 keyword phrases in flex-grid)
-4. Work Experience (reverse chronological)
-5. Projects (top 3-4 most relevant)
-6. Education & Certifications
-7. Skills (languages + technical)
+3. Work Experience (reverse chronological)
+4. Projects (top 3-4 most relevant)
+5. Education & Certifications
+6. Skills (languages + technical)
+
+No Core Competencies section (confirmed 2026-09-23, see `modes/_custom.md`) — the JD keyword phrases that used to populate it live in Skills and the Summary/bullets instead. `modes/_custom.md`'s own logged section-order house rule for this candidate's templates takes precedence over this generic list where it applies.
 
 ## Keyword injection strategy (ethical, truth-based)
 
@@ -149,7 +150,6 @@ Write a JSON file with this structure, then run `node build-cv-html.mjs <input.j
   },
   "sections": {
     "summary": "Professional Summary",
-    "competencies": "Core Competencies",
     "experience": "Work Experience",
     "projects": "Projects",
     "education": "Education",
@@ -158,7 +158,6 @@ Write a JSON file with this structure, then run `node build-cv-html.mjs <input.j
     "skills": "Skills"
   },
   "summary": "Personalized summary with JD keywords injected (honest vs cv.md).",
-  "competencies": ["RAG Pipelines", "LLMOps", "Kubernetes & Docker"],
   "experience": [
     {
       "company": "Company Name",
@@ -172,7 +171,7 @@ Write a JSON file with this structure, then run `node build-cv-html.mjs <input.j
     { "name": "Project Name", "url": "https://github.com/...", "badge": "Open Source", "tech": "Python, FastAPI", "description": "What it does." }
   ],
   "education": [
-    { "title": "B.S. Computer Science", "org": "University Name", "location": "City, ST", "year": "2022", "description": "Optional line." }
+    { "title": "B.S. Computer Science", "org": "University Name", "year": "2022", "description": "Optional line." }
   ],
   "certifications": [
     { "title": "Certified Kubernetes Administrator", "org": "CNCF", "year": "2024" }
@@ -204,11 +203,11 @@ Write a JSON file with this structure, then run `node build-cv-html.mjs <input.j
 | `candidate.photo_style` | string | Optional photo framing: `rounded` (default), `circle`, or `square`. Read it from `candidate.photo_style` in `config/profile.yml`; invalid values fail before HTML is written. |
 | `sections` | object | Optional localized section titles; any omitted key falls back to the English default shown above. |
 | `summary` | string | Personalized summary with keywords. Supports `**…**` emphasis (see **Markdown bold** below). |
-| `competencies` | string[] | 6-8 keyword phrases → competency tags. |
+| `competencies` | string[] | **No longer populated by this workflow (confirmed 2026-09-23, see `modes/_custom.md`).** The renderer still accepts the key for backward compatibility (an empty/omitted array cleanly drops the whole Core Competencies section, header included, via `stripEmptySections` in `cv-sections-core.mjs`), but Step 13 now folds the same JD-matched keyword phrases into `skills[]` and the Summary/experience bullets instead — never pass this field for a new CV. |
 | `experience[]` | object | `company`, `role`, `location` (optional), `dates`, `bullets` (reordered, keyword-injected; `**…**` emphasis supported). Optional section — omit the key or pass `[]` and the whole block is dropped, header included. Only for candidates with no professional history to list (students, new graduates, career changers); never drop it to hide a gap. |
 | `projects[]` | object | `name`, `url` (optional project/repo link), `badge` (optional), `tech` (optional), `description` (a `bullets` array is also accepted and joined into the description line). |
-| `education[]` | object | `title` (degree), `org` (institution), `location` (optional, city/state), `year`, `description` (optional). |
-| `certifications[]` | object | `title`, `org`, `year`. |
+| `education[]` | object | `title` (degree), `org` (institution), `year`, `description` (optional). No `location` field (confirmed 2026-09-23) — every education entry renders as one line (title + org, year right-aligned); an entry never shows a separate address line, unlike `experience[]`. A payload that still sets `education[].location` is not an error, but the value is ignored and `build-cv-html.mjs` warns about it. |
+| `certifications[]` | object | `title`, `org`, `year`, `url` (optional — links the title, e.g. a Coursera/credential share link; omit for a plain-text title). |
 | `awards[]` | object | `title` (award name), `org` (issuing body, optional), `year` (optional). Optional section — omit the key or pass `[]` and the whole block is dropped, header included. Use it for competitive or academic distinctions (olympiad medals, hackathon wins, dean's list) that carry more signal than a thin experience section. |
 | `skills[]` | object | `items` (**required**): a non-blank comma-separated string, or a non-empty array of non-blank strings — every element must be text, since the builder joins the whole array. `category` (optional): omitted, the line renders without its prefix. |
 

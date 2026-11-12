@@ -28,7 +28,7 @@ version: 1.0.0
   :root {
     --accent-color: hsl(222 47% 34%);
     --font-family: "Liberation Sans", 'Helvetica Neue', Arial, 'DejaVu Sans', sans-serif;
-    --font-size: 10px;
+    --font-size: 11px;
     /* Must match generate-pdf.mjs's PDF_PAGE_MARGIN — the real @page margin is
        appended later by injectPrintPageCss reading this same variable. */
     --page-margin: 0.6in;
@@ -180,10 +180,27 @@ version: 1.0.0
     white-space: nowrap;
   }
 
+  .job-title-line {
+    font-family: var(--font-family);
+  }
+
+  .job-role-inline {
+    font-size: 12px;
+    font-weight: 700;
+    color: #2a3340;
+  }
+
+  .job-company-inline {
+    font-size: 12px;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--accent-color);
+  }
+
   /* Role and location share one line to save vertical space. */
   .job-role {
     display: inline;
-    font-size: 9.5px;
+    font-size: 10.5px;
     font-weight: 600;
     color: #2a3340;
   }
@@ -239,7 +256,7 @@ version: 1.0.0
 
   .edu-title { font-weight: 700; color: #191c22; }
 
-  .edu-org { font-weight: 400; color: #2a3340; }
+  .edu-org { font-weight: 400; color: #2a3340; font-style: italic; }
 
   .edu-year { font-size: 8.5px; color: #626b78; white-space: nowrap; }
 
@@ -357,6 +374,22 @@ version: 1.0.0
     <div class="summary-text">{{SUMMARY_TEXT}}</div>
   </div>
 
+  <!-- EDUCATION -->
+  <div class="section">
+    <div class="section-title">{{SECTION_EDUCATION}}</div>
+    <div class="education-body">
+      {{EDUCATION}}
+    </div>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="section">
+    <div class="section-title">{{SECTION_SKILLS}}</div>
+    <div class="skills-body">
+      {{SKILLS}}
+    </div>
+  </div>
+
   <!-- CORE COMPETENCIES -->
   <div class="section">
     <div class="section-title">{{SECTION_COMPETENCIES}}</div>
@@ -381,14 +414,6 @@ version: 1.0.0
     </div>
   </div>
 
-  <!-- EDUCATION -->
-  <div class="section">
-    <div class="section-title">{{SECTION_EDUCATION}}</div>
-    <div class="education-body">
-      {{EDUCATION}}
-    </div>
-  </div>
-
   <!-- CERTIFICATIONS -->
   <div class="section">
     <div class="section-title">{{SECTION_CERTIFICATIONS}}</div>
@@ -399,14 +424,6 @@ version: 1.0.0
   <div class="section">
     <div class="section-title">{{SECTION_AWARDS}}</div>
     <div class="award-table">{{AWARDS}}</div>
-  </div>
-
-  <!-- SKILLS -->
-  <div class="section">
-    <div class="section-title">{{SECTION_SKILLS}}</div>
-    <div class="skills-body">
-      {{SKILLS}}
-    </div>
   </div>
 
   <!-- END -->

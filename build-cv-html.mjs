@@ -409,8 +409,14 @@ function buildProjects(entries, partial) {
       const tech = e.tech
         ? `\n    <div class="project-tech">${escapeHtml(e.tech)}</div>`
         : '';
+      const dateText = e.dates || '';
+      const date = dateText
+        ? `\n      <div class="project-date">${escapeHtml(dateText)}</div>`
+        : '';
       return `<div class="project">
-    <div class="project-title">${nameHtml}${badge}</div>${desc}${tech}
+    <div class="project-header">
+      <div class="project-title">${nameHtml}${badge}</div>${date}
+    </div>${desc}${tech}
   </div>`;
     }).join('\n  ');
   }
@@ -420,9 +426,10 @@ function buildProjects(entries, partial) {
     const descText = e.description
       || (Array.isArray(e.bullets) ? e.bullets.filter(Boolean).join(' ') : '');
     const blockValues = new Map([
-      ['BADGE_BLOCK', { value: escapeHtml(e.badge || ''), present: Boolean(e.badge) }],
-      ['DESC_BLOCK',  { value: escapeHtml(descText),      present: Boolean(descText) }],
-      ['TECH_BLOCK',  { value: escapeHtml(e.tech || ''),  present: Boolean(e.tech) }],
+      ['BADGE_BLOCK', { value: escapeHtml(e.badge || ''),  present: Boolean(e.badge) }],
+      ['DATE_BLOCK',  { value: escapeHtml(e.dates || ''),  present: Boolean(e.dates) }],
+      ['DESC_BLOCK',  { value: escapeHtml(descText),       present: Boolean(descText) }],
+      ['TECH_BLOCK',  { value: escapeHtml(e.tech || ''),   present: Boolean(e.tech) }],
     ]);
     const nameText = escapeHtml(e.name || '');
     const url = sanitizeUrl(e.url);
@@ -432,21 +439,23 @@ function buildProjects(entries, partial) {
     return fillEntry(entryTemplate, blocks, {
       NAME:  nameHtml,
       BADGE: escapeHtml(e.badge || ''),
+      DATE:  escapeHtml(e.dates || ''),
       DESC:  escapeHtml(descText),
       TECH:  escapeHtml(e.tech || ''),
     }, blockValues);
   }).join('\n  ');
 }
 
+// Location is intentionally not rendered for education entries — each entry
+// is one line (title + org, year right-aligned), no address line. Confirmed
+// 2026-09-23, see modes/_custom.md. A payload's education[].location, if any,
+// is simply ignored (not an error — see lib/cv-payload-schema.mjs).
 function buildEducation(entries, partial) {
   if (!Array.isArray(entries) || entries.length === 0) return '';
   if (!partial) {
     return entries.filter(e => hasRequiredFields(e, 'education', 'html')).map(e => {
       const org = e.org
         ? ` <span class="edu-org">${escapeHtml(e.org)}</span>`
-        : '';
-      const location = e.location
-        ? `\n    <div class="edu-location">${escapeHtml(e.location)}</div>`
         : '';
       const desc = e.description
         ? `\n    <div class="edu-desc">${escapeHtml(e.description)}</div>`
@@ -455,7 +464,7 @@ function buildEducation(entries, partial) {
     <div class="edu-header">
       <div class="edu-title">${escapeHtml(e.title)}${org}</div>
       <div class="edu-year">${escapeHtml(e.year || '')}</div>
-    </div>${location}${desc}
+    </div>${desc}
   </div>`;
     }).join('\n  ');
   }
@@ -463,18 +472,25 @@ function buildEducation(entries, partial) {
   const { entryTemplate, blocks } = partial;
   return entries.filter(e => hasRequiredFields(e, 'education', 'html')).map(e => {
     const blockValues = new Map([
-      ['ORG_BLOCK',      { value: escapeHtml(e.org || ''),         present: Boolean(e.org) }],
-      ['LOCATION_BLOCK', { value: escapeHtml(e.location || ''),    present: Boolean(e.location) }],
-      ['DESC_BLOCK',     { value: escapeHtml(e.description || ''), present: Boolean(e.description) }],
+      ['ORG_BLOCK',  { value: escapeHtml(e.org || ''),         present: Boolean(e.org) }],
+      ['DESC_BLOCK', { value: escapeHtml(e.description || ''), present: Boolean(e.description) }],
     ]);
     return fillEntry(entryTemplate, blocks, {
-      TITLE:    escapeHtml(e.title || ''),
-      ORG:      escapeHtml(e.org || ''),
-      LOCATION: escapeHtml(e.location || ''),
-      YEAR:     escapeHtml(e.year || ''),
-      DESC:     escapeHtml(e.description || ''),
+      TITLE: escapeHtml(e.title || ''),
+      ORG:   escapeHtml(e.org || ''),
+      YEAR:  escapeHtml(e.year || ''),
+      DESC:  escapeHtml(e.description || ''),
     }, blockValues);
   }).join('\n  ');
+}
+
+// A certification's title links to e.url (e.g. a Coursera/credential share
+// link) when provided, the same optional-link pattern buildProjects uses for
+// project names. No link → plain escaped text, unchanged from before.
+function certTitleHtml(e) {
+  const titleText = escapeHtml(e.title || '');
+  const url = sanitizeUrl(e.url);
+  return url ? `<a href="${url}">${titleText}<span class="ext-link-icon"> ↗</span></a>` : titleText;
 }
 
 function buildCertifications(entries, partial) {
@@ -484,7 +500,7 @@ function buildCertifications(entries, partial) {
       const org = e.org ? `<span class="cert-org">${escapeHtml(e.org)}</span>` : '<span class="cert-org"></span>';
       const year = e.year ? `<span class="cert-year">${escapeHtml(e.year)}</span>` : '<span class="cert-year"></span>';
       return `<div class="cert-item">
-      <span class="cert-title">${escapeHtml(e.title)}</span>
+      <span class="cert-title">${certTitleHtml(e)}</span>
       ${org}
       ${year}
     </div>`;
@@ -500,7 +516,7 @@ function buildCertifications(entries, partial) {
       ['YEAR_BLOCK', { value: escapeHtml(e.year || ''), present: Boolean(e.year) }],
     ]);
     return fillEntry(entryTemplate, blocks, {
-      TITLE: escapeHtml(e.title || ''),
+      TITLE: certTitleHtml(e),
       ORG:   escapeHtml(e.org || ''),
       YEAR:  escapeHtml(e.year || ''),
     }, blockValues);
@@ -601,12 +617,12 @@ function buildContactRow(candidate) {
     items.push(`<a href="${sanitizeUrl('mailto:' + c.email)}">${escapeHtml(c.email)}</a>`);
   }
   if (c.linkedin && c.linkedin.url) {
-    items.push(`<a href="${sanitizeUrl(c.linkedin.url)}">${escapeHtml(c.linkedin.display || c.linkedin.url)}</a>`);
+    items.push(`<a href="${sanitizeUrl(c.linkedin.url)}">${escapeHtml(c.linkedin.display || c.linkedin.url)}<span class="ext-link-icon"> ↗</span></a>`);
   }
   if (c.github && c.github.url) {
     const githubHref = sanitizeUrl(c.github.url);
     if (githubHref) {
-      items.push(`<a href="${githubHref}">${escapeHtml(c.github.display || c.github.url)}</a>`);
+      items.push(`<a href="${githubHref}">${escapeHtml(c.github.display || c.github.url)}<span class="ext-link-icon"> ↗</span></a>`);
     }
   }
   if (c.portfolio && c.portfolio.url) {
@@ -841,7 +857,6 @@ async function runSelfTest() {
     education: [{
       title: 'Bachelor of Science in Computer Science',
       org: 'Test University',
-      location: 'City, State',
       year: '2024',
       description: 'Coursework: Data Structures, Algorithms, Machine Learning.',
     }],
@@ -962,17 +977,21 @@ async function runSelfTest() {
   }
 
   // Guard that conditional blocks work: location present → rendered; absent → not.
-  if (!html.includes('class="job-location"')) {
-    console.error('Self-test failed: job-location block not rendered when location is present');
+  // Job location is no longer its own div (#3XXX, combined job-header line) —
+  // it renders inline as ", {location}" appended after the company name inside
+  // .job-company-inline, so check for that instead of a separate location class.
+  if (!html.includes('class="job-company-inline">Test Corp, Remote</span>')) {
+    console.error('Self-test failed: location not appended inline after company when present');
     process.exit(1);
   }
-  if (!html.includes('class="edu-location"')) {
-    console.error('Self-test failed: edu-location block not rendered when education location is present');
+  if (html.includes('class="edu-location"')) {
+    console.error('Self-test failed: edu-location rendered — education never shows a location line (#3523 follow-up)');
     process.exit(1);
   }
 
   // Test with experience and education entries that have no location to verify
-  // the LOCATION_BLOCK conditional removal path.
+  // the LOCATION_BLOCK conditional removal path (experience only — education
+  // never renders a location at all, see check above).
   const noLocSample = {
     ...sample,
     experience: [{ company: 'Acme', role: 'Engineer', dates: '2023', bullets: [] }],
@@ -986,12 +1005,8 @@ async function runSelfTest() {
     console.error(`Self-test failed (no-location variant): ${err.message}`);
     process.exit(1);
   }
-  if (noLocHtml.includes('class="job-location"')) {
-    console.error('Self-test failed: job-location block rendered when location is absent');
-    process.exit(1);
-  }
-  if (noLocHtml.includes('class="edu-location"')) {
-    console.error('Self-test failed: edu-location block rendered when education location is absent');
+  if (!noLocHtml.includes('class="job-company-inline">Acme</span>')) {
+    console.error('Self-test failed: company rendered with a stray location suffix when location is absent');
     process.exit(1);
   }
 

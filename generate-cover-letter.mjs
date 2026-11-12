@@ -96,6 +96,21 @@ function asUrl(value) {
   return /^https?:\/\//i.test(value) ? value : `https://${value}`;
 }
 
+/**
+ * Render a profile link (LinkedIn/GitHub) to match the CV contact row:
+ * a short label ("LinkedIn") plus a trailing ↗ icon, rather than the raw URL.
+ * Accepts either a bare URL string (label derived from the URL) or a
+ * { url, display } object (label = display), mirroring build-cv-html.mjs.
+ */
+function profileLink(value) {
+  const url = typeof value === "string" ? value : value.url;
+  const display =
+    value && typeof value === "object" && value.display
+      ? value.display
+      : url.replace(/^https?:\/\//i, "");
+  return `<a href="${escapeHtml(asUrl(url))}">${escapeHtml(display)}<span class="ext-link-icon"> ↗</span></a>`;
+}
+
 /** Build the escaped contact line shown in the cover-letter header. */
 function buildContactLine(candidate) {
   const parts = [];
@@ -105,14 +120,8 @@ function buildContactLine(candidate) {
     parts.push(`<a href="mailto:${email}">${email}</a>`);
   }
   if (candidate.phone) parts.push(escapeHtml(candidate.phone));
-  if (candidate.linkedin) {
-    const display = candidate.linkedin.replace(/^https?:\/\//i, "");
-    parts.push(`<a href="${escapeHtml(asUrl(candidate.linkedin))}">${escapeHtml(display)}</a>`);
-  }
-  if (candidate.github) {
-    const display = candidate.github.replace(/^https?:\/\//i, "");
-    parts.push(`<a href="${escapeHtml(asUrl(candidate.github))}">${escapeHtml(display)}</a>`);
-  }
+  if (candidate.linkedin) parts.push(profileLink(candidate.linkedin));
+  if (candidate.github) parts.push(profileLink(candidate.github));
   return parts.join(" &nbsp;|&nbsp; ");
 }
 
@@ -120,7 +129,9 @@ function buildContactLine(candidate) {
 function buildCredentialsBlock(candidate) {
   const credentials = candidate.credentials || [];
   if (!credentials.length) return "";
-  return `<div class="credentials">${credentials.map(escapeHtml).join(" &nbsp;|&nbsp; ")}</div>`;
+  // One credential per line, so a long degree + institution never wraps
+  // mid-phrase into an awkward orphan on the next line.
+  return `<div class="credentials">${credentials.map(escapeHtml).join("<br>")}</div>`;
 }
 
 /** Build the escaped company, city, and date line for the letter. */

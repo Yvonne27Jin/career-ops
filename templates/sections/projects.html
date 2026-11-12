@@ -11,11 +11,15 @@
 -->
 <!--ENTRY-->
 <div class="project">
-  <div class="project-title">{{NAME}}{{BADGE_BLOCK}}</div>
+  <div class="project-header">
+    <div class="project-title">{{NAME}}{{BADGE_BLOCK}}</div>
+    {{DATE_BLOCK}}
+  </div>
   {{DESC_BLOCK}}
   {{TECH_BLOCK}}
 </div>
 <!--BADGE_BLOCK--><span class="project-badge">{{BADGE}}</span><!--/BADGE_BLOCK-->
+<!--DATE_BLOCK--><div class="project-date">{{DATE}}</div><!--/DATE_BLOCK-->
 <!--DESC_BLOCK--><div class="project-desc">{{DESC}}</div><!--/DESC_BLOCK-->
 <!--TECH_BLOCK--><div class="project-tech">{{TECH}}</div><!--/TECH_BLOCK-->
 <!--/ENTRY-->

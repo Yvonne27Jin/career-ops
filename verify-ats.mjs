@@ -59,6 +59,12 @@ const ATS_SAFE_FONTS = new Set([
   'noto sans cjk jp', 'noto sans jp', 'meiryo', 'ms pgothic', 'pingfang sc',
   'hiragino sans gb', 'microsoft yahei', 'noto sans cjk sc', 'noto sans sc',
   'source han sans sc',
+  // Korean fallbacks (html[lang="ko"] block).
+  'apple sd gothic neo', 'malgun gothic', 'noto sans cjk kr', 'noto sans kr',
+  'nanum gothic',
+  // Traditional Chinese fallbacks (html[lang="zh-TW"] block).
+  'pingfang tc', 'microsoft jhenghei', 'noto sans cjk tc', 'noto sans tc',
+  'source han sans tc',
 ]);
 
 // Generic CSS families — always valid, never "non-standard", so skip them.
@@ -350,7 +356,9 @@ function auditAts(html, opts = {}) {
 
   // 5. No CV text baked into images.
   let imageScore = WEIGHTS.images;
-  const imgs = [...html.matchAll(/<img\b[^>]*>/gi)].map(m => m[0]);
+  // Scan content-stripped HTML: a literal "<img>" inside a <style> comment (e.g.
+  // documenting the opt-in photo slot) is not a real tag and must not count.
+  const imgs = [...stripNonContentRegions(html).matchAll(/<img\b[^>]*>/gi)].map(m => m[0]);
   const contentImgs = imgs.filter(tag => !/class\s*=\s*(?:"[^"]*\bcv-photo\b[^"]*"|'[^']*\bcv-photo\b[^']*')/i.test(tag));
   if (contentImgs.length > 0 && text.length < TEXT_LOW_WITH_IMG) {
     imageScore = 0;
@@ -363,10 +371,28 @@ function auditAts(html, opts = {}) {
 
   // 6. Standard, embeddable fonts. Scan both <style> blocks and inline styles so
   // an inline font-family is scored the same as one in a stylesheet.
+  //
+  // A `font-family` value may reference a CSS custom property, e.g.
+  // `font-family: var(--font-family), 'Hiragino Sans', ...` (templates/cv-template.html
+  // themes every language block off one `--font-family` token). Resolve `var(--x)`
+  // to its declared value before splitting on commas, or the literal string
+  // "var(--font-family)" gets treated as a font name and flagged as non-standard
+  // — it is never what a PDF renderer actually sets as the font.
+  const rootVars = new Map();
+  for (const m of css.matchAll(/--([\w-]+)\s*:\s*([^;{}]+);/g)) {
+    rootVars.set(m[1].trim(), m[2].trim());
+  }
+  function resolveVars(value, depth = 0) {
+    if (depth > 5) return value; // guard against a self-referential custom property
+    return value.replace(/var\(\s*--([\w-]+)\s*(?:,\s*([^)]+))?\)/gi, (whole, name, fallback) => {
+      const resolved = rootVars.get(name) ?? fallback ?? '';
+      return resolveVars(resolved, depth + 1);
+    });
+  }
   const families = new Set();
   for (const blob of styleBlobs) {
     for (const m of blob.matchAll(/font-family\s*:\s*([^;{}]+)/gi)) {
-      for (const raw of m[1].split(',')) {
+      for (const raw of resolveVars(m[1]).split(',')) {
         const fam = raw.replace(/['"]/g, '').trim().toLowerCase();
         if (fam && !GENERIC_FAMILIES.has(fam)) families.add(fam);
       }
